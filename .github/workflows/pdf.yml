@@ -1,0 +1,38 @@
+name: Generate Physics PDF
+
+on:
+  workflow_dispatch:  # Ye line wo "Button" enable karti hai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Python Libraries
+        run: |
+          pip install matplotlib numpy
+
+      - name: Install PDF Tools (Pandoc & LaTeX)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic
+
+      - name: Run Python Script (Generate Graphs & Text)
+        run: python notes_generator.py
+
+      - name: Convert to PDF
+        run: pandoc notes.md -o Capacitors_Notes.pdf --pdf-engine=xelatex
+
+      - name: Upload PDF Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Physics-Notes-PDF
+          path: Capacitors_Notes.pdf
